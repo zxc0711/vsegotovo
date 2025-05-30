@@ -1,0 +1,46 @@
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.navbar {
+    background-color: #343a40;
+}
+.navbar-brand, .nav-link, .navbar-text {
+    color: white !important;
+}
+.container-main {
+    flex: 1;
+    padding: 30px 0;
+}
+.footer {
+    padding: 1rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+/* Стили для FullCalendar */
+.fc-event {
+    cursor: pointer;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 4px;
+    opacity: 0.9;
+}
+.fc-event:hover {
+    opacity: 1;
+}
+
+/* Цвета для критичности */
+.bg-green { background-color: #28a745 !important; }
+.bg-yellow { background-color: #ffc107 !important; }
+.bg-red { background-color: #dc3545 !important; }
+.bg-black { background-color: #000000 !important; }
+
+/* Иконки событий */
+.fc-event-title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}

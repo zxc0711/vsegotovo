@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Главная{% endblock %}</title>
+<!-- Bootstrap CSS -->
+<!-- Стили -->
+<link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/bootstrap-icons.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/main.min.css') }}" rel="stylesheet">
+<!-- Стили -->
+
+
+<!-- Скрипты -->
+
+
+
+
+    <!-- Bootstrap 5.3.0 CSS -->
+
+
+    <!-- Стили -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            background-color: #343a40;
+        }
+        .navbar-brand, .nav-link, .navbar-text {
+            color: white !important;
+        }
+        .container-main {
+            flex: 1;
+            padding: 30px 0;
+        }
+        .footer {
+            padding: 1rem;
+            text-align: center;
+            color: #6c757d;
+        }
+
+        /* Стили для FullCalendar */
+        .fc-event {
+            cursor: pointer;
+            font-size: 0.9em;
+            border: none;
+            border-radius: 4px;
+            opacity: 0.9;
+        }
+        .fc-event:hover {
+            opacity: 1;
+        }
+
+        /* Цвета для критичности */
+        .bg-green { background-color: #28a745 !important; }
+        .bg-yellow { background-color: #ffc107 !important; }
+        .bg-red { background-color: #dc3545 !important; }
+        .bg-black { background-color: #000000 !important; }
+
+        /* Иконки событий */
+        .fc-event-title {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        /* Увеличиваем высоту ячеек */
+.fc-daygrid-day-frame {
+    min-height: 100px;
+}
+
+/* Стили для событий */
+.fc-event {
+    font-size: 0.85em;
+    padding: 2px 4px;
+    margin: 1px 0;
+    white-space: normal !important; /* Разрешаем перенос текста */
+    overflow: visible !important;
+}
+
+/* Цвета для критичности */
+.fc-event-green { background-color: #28a745; border-color: #28a745; }
+.fc-event-yellow { background-color: #ffc107; border-color: #ffc107; }
+.fc-event-red { background-color: #dc3545; border-color: #dc3545; }
+.fc-event-black { background-color: #000000; border-color: #000000; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Навигационная панель -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('index') }}">Рисковый мониторинг</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                {% if session.logged_in %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('add_risk') }}">Добавить риск</a>
+                    </li>
+
+                    {% if session.role in ['admin', 'governor'] %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('archive') }}">Архив</a>
+                        </li>
+                    {% endif %}
+
+                    {% if session.role in ['admin', 'governor', 'omsu', 'oigv'] %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('report') }}">Формирование отчёта</a>
+                        </li>
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('calendar') }}">Календарь</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Выход</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Вход</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Основной контент -->
+<div class="container container-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</div>
+
+<!-- Подвал -->
+<div class="footer">&copy; 2025 Управление рисками</div>
+
+<!-- JS -->
+
+
+</body>
+</html>

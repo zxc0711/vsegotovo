@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Архив рисков{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">Архив рисков</h2>
+  {% if archived and archived|length > 0 %}
+    <table class="table table-bordered">
+      <thead class="table-light">
+        <tr>
+          <th>Название</th>
+          <th>Дата добавления</th>
+          <th>Дата закрытия</th>
+          <th>Статус</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for risk in archived %}
+          <tr>
+            <td>{{ risk.title }}</td>
+            <td>{{ risk.date_added }}</td>
+            <td>{{ risk.closed_at }}</td>
+            <td>{{ risk.status }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="text-muted text-center">Архив пуст.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+def gui_show_participants():
+    participants_window = ctk.CTkToplevel()
+    participants_window.title("Список участников")
+
+    text_area = ctk.CTkTextbox(participants_window, height=200, width=600)
+    text_area.pack(pady=10)
+
+    for participant in Participant.list():
+        text_area.insert(
+            "end",
+            f"ID: {participant.ID}, Имя: {participant.name} {participant.surname}, Почта: {participant.email}\n"
+        )
+    text_area.configure(state="disabled")  # Запретить редактирование

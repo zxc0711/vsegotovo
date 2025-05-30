@@ -1,0 +1,33 @@
+<LoginScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 50
+        spacing: 20
+        canvas.before:
+            Color:
+                rgba: 0.1, 0.1, 0.1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: "Вход в систему"
+            font_size: 32
+            color: 1, 0.5, 0, 1
+
+        TextInput:
+            hint_text: "Имя пользователя"
+            background_color: .2, .2, .2, 1
+            foreground_color: 1, 1, 1, 1
+
+        TextInput:
+            hint_text: "Пароль"
+            password: True
+            background_color: .2, .2, .2, 1
+            foreground_color: 1, 1, 1, 1
+
+        Button:
+            text: "Войти"
+            background_color: 1, 0.5, 0, 1
+            color: 0, 0, 0, 1
+            on_press: app.root.current = 'dashboard'

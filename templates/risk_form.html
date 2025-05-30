@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ 'Редактирование риска' if risk else 'Добавление нового риска' }}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">{{ 'Редактирование риска' if risk else 'Добавление нового риска' }}</h2>
+  <form method="post" enctype="multipart/form-data">
+    <div class="row">
+
+      <!-- Название риска -->
+      <div class="col-md-6 mb-3">
+        <label for="title" class="form-label">Название риска</label>
+        <input type="text" name="title" id="title" class="form-control" required
+               value="{{ risk.title if risk else '' }}">
+      </div>
+
+      <!-- Ссылка на источник -->
+      <div class="col-md-6 mb-3">
+        <label for="source_link" class="form-label">Ссылка на источник</label>
+        <input type="url" name="source_link" id="source_link" class="form-control"
+               value="{{ risk.source if risk else '' }}">
+      </div>
+
+      <!-- Срок отработки (часы/дни) -->
+      <div class="col-md-6 mb-3">
+        <label>Срок отработки</label>
+        <div class="input-group">
+          <input type="number" name="deadline_value" class="form-control" min="1" required
+                 value="{{ risk.deadline_value if risk and risk.deadline_value is not none else 1 }}">
+          <select name="deadline_unit" class="form-control">
+            <option value="hours" {% if risk and risk.deadline_unit =='часы' %}selected{% endif %}>Часы</option>
+            <option value="days" {% if risk and risk.deadline_unit =='дни' %}selected{% endif %}>Дни</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Риск повторяющийся -->
+      <div class="col-md-6 mb-3">
+        <label class="form-label d-block">Риск повторяющийся?</label>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="is_repeating" name="is_repeating"
+                 {% if risk and risk.is_repeating %}checked{% endif %}>
+          <label class="form-check-label" for="is_repeating">Да</label>
+        </div>
+      </div>
+
+      <!-- Описание -->
+      <div class="col-12 mb-3">
+        <label for="description" class="form-label">Описание</label>
+        <textarea name="description" id="description" class="form-control" rows="3" required>{{ risk.description if risk else '' }}</textarea>
+      </div>
+
+      <!-- Обоснование -->
+      <div class="col-12 mb-3">
+        <label for="justification" class="form-label">Обоснование</label>
+        <textarea name="justification" id="justification" class="form-control" rows="3">{{ risk.justification if risk else '' }}</textarea>
+      </div>
+
+      <!-- Категория -->
+      <div class="col-md-4 mb-3">
+        <label for="category" class="form-label">Категория</label>
+        <select name="category" id="category" class="form-select" required>
+          <option disabled {% if not risk %}selected{% endif %}>Выберите категорию</option>
+          {% for cat in ['Дороги', 'ЖКХ', 'Благоустройство', 'Здравоохранение', 'Транспорт', 'Экология'] %}
+            <option value="{{ cat }}" {% if risk and risk.category == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Муниципалитет -->
+      <div class="col-md-4 mb-3">
+        <label for="municipality" class="form-label">Муниципалитет</label>
+        <select name="municipality" id="municipality" class="form-select" required>
+          <option disabled {% if not risk %}selected{% endif %}>Выберите муниципалитет</option>
+          {% for mun in ['Вологда', 'Череповец', 'Вологодский округ'] %}
+            <option value="{{ mun }}" {% if risk and risk.municipality == mun %}selected{% endif %}>{{ mun }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Критичность -->
+      <div class="col-md-4 mb-3">
+        <label for="criticality" class="form-label">Критичность</label>
+        <select name="criticality" id="criticality" class="form-select" required>
+          <option disabled {% if not risk %}selected{% endif %}>Выберите уровень</option>
+          {% for level in ['Зеленый', 'Желтый', 'Красный', 'Черный'] %}
+            <option value="{{ level }}" {% if risk and risk.criticality == level %}selected{% endif %}>{{ level }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- ОМСУ -->
+      <div class="col-md-4 mb-3">
+        <label for="omsu" class="form-label">ОМСУ</label>
+        <select name="omsu" id="omsu" class="form-select">
+          <option disabled {% if not risk %}selected{% endif %}>Выберите</option>
+          <option value="ОМСУ 1" {% if risk and risk.omsu =='ОМСУ1' %}selected{% endif %}>ОМСУ 1</option>
+          <option value="ОМСУ 2" {% if risk and risk.omsu =='ОМСУ2' %}selected{% endif %}>ОМСУ 2</option>
+        </select>
+      </div>
+
+      <!-- ОИГВ -->
+      <div class="col-md-4 mb-3">
+        <label for="oigv" class="form-label">ОИГВ</label>
+        <select name="oigv" id="oigv" class="form-select">
+          <option disabled {% if not risk %}selected{% endif %}>Выберите</option>
+          <option value="ОИГВ 1" {% if risk and risk.oigv =='ОИГВ1' %}selected{% endif %}>ОИГВ 1</option>
+          <option value="ОИГВ 2" {% if risk and risk.oigv =='ОИГВ2' %}selected{% endif %}>ОИГВ 2</option>
+        </select>
+      </div>
+
+      <!-- Заместитель губернатора -->
+      <div class="col-md-4 mb-3">
+        <label for="deputy" class="form-label">Курирующий заместитель губернатора</label>
+        <select name="deputy" id="deputy" class="form-select">
+          <option disabled {% if not risk %}selected{% endif %}>Выберите</option>
+          <option value="Зам. 1" {% if risk and risk.deputy =='Зам.1' %}selected{% endif %}>Зам. 1</option>
+          <option value="Зам. 2" {% if risk and risk.deputy =='Зам.2' %}selected{% endif %}>Зам. 2</option>
+        </select>
+      </div>
+
+      <!-- Кнопки -->
+      <div class="col-12 mt-4 d-flex justify-content-between">
+        <button type="submit" class="btn btn-success">{{ 'Сохранить' if risk else 'Внести риск' }}</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Назад</a>
+      </div>
+
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Формирование отчёта{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">Формирование отчёта</h2>
+  <form method="post" class="mb-4">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label for="period" class="form-label">Выберите период</label>
+        <select name="period" id="period" class="form-select" onchange="updateDates()">
+          <option value="">-- Выберите период --</option>
+          <option value="day">День</option>
+          <option value="week">Неделя</option>
+          <option value="month">Месяц</option>
+          <option value="year">Год</option>
+          <option value="custom">Произвольный</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label for="start_date" class="form-label">Дата начала</label>
+        <input type="datetime-local" name="start_date" id="start_date" class="form-control"
+               value="{{ start_date if start_date }}">
+      </div>
+
+      <div class="col-md-4">
+        <label for="end_date" class="form-label">Дата окончания</label>
+        <input type="datetime-local" name="end_date" id="end_date" class="form-control"
+               value="{{ end_date if end_date }}">
+      </div>
+    </div>
+
+    <div class="mt-3">
+      <button type="submit" class="btn btn-primary">Сформировать отчёт</button>
+      {% if risks and risks|length > 0 %}
+        <a href="{{ url_for('export_report', format='excel', start_date=start_date, end_date=end_date) }}" class="btn btn-success ms-2">Экспорт в Excel</a>
+        <a href="{{ url_for('export_report', format='pdf', start_date=start_date, end_date=end_date) }}" class="btn btn-danger ms-2">Экспорт в PDF</a>
+      {% endif %}
+    </div>
+  </form>
+
+  {% if risks and risks|length > 0 %}
+    <table class="table table-bordered">
+      <thead class="table-light">
+        <tr>
+          <th>Название</th>
+          <th>Дата добавления</th>
+          <th>Дата отработки</th>
+          <th>Исполнители</th>
+          <th>Муниципалитет</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in risks %}
+          <tr>
+            <td>{{ r.title }}</td>
+            <td>{{ r.date_added }}</td>
+            <td>{{ r.closed_at if r.closed_at else '—' }}</td>
+            <td>ОМСУ: {{ r.omsu }}<br>ОИГВ: {{ r.oigv }}<br>Заместитель: {{ r.deputy }}</td>
+            <td>{{ r.municipality }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% elif risks %}
+    <p class="text-muted">Нет рисков за выбранный период.</p>
+  {% endif %}
+</div>
+
+<script>
+function updateDates() {
+    const period = document.getElementById('period').value;
+    const startInput = document.getElementById('start_date');
+    const endInput = document.getElementById('end_date');
+
+    const now = new Date();
+    let start, end;
+
+    if (period === 'day') {
+        start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59);
+    } else if (period === 'week') {
+        const day = now.getDay() || 7;
+        start = new Date(now);
+        start.setDate(start.getDate() - day + 1);
+        end = new Date(start);
+        end.setDate(end.getDate() + 6);
+        end.setHours(23, 59);
+        start.setHours(0, 0);
+    } else if (period === 'month') {
+        start = new Date(now.getFullYear(), now.getMonth(), 1);
+        end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59);
+    } else if (period === 'year') {
+        start = new Date(now.getFullYear(), 0, 1);
+        end = new Date(now.getFullYear(), 11, 31, 23, 59);
+    } else {
+        return;
+    }
+
+    startInput.value = start.toISOString().slice(0, 16);
+    endInput.value = end.toISOString().slice(0, 16);
+}
+</script>
+{% endblock %}

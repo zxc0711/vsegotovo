@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}Карточка риска - {{ risk.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <!-- Заголовок с критичностью -->
+        <div class="card-header
+            {% if risk.criticality == 'Зеленый' %}bg-green
+            {% elif risk.criticality == 'Желтый' %}bg-yellow
+            {% elif risk.criticality == 'Красный' %}bg-red
+            {% elif risk.criticality == 'Черный' %}bg-black
+            {% else %}bg-secondary{% endif %}
+            d-flex justify-content-between align-items-center">
+            <span class="text-white">{{ risk.title }}</span>
+            <span class="badge text-white
+                {% if risk.status == 'Новый' %}bg-primary
+                {% elif risk.status == 'Взято в работу' %}bg-info
+                {% elif risk.status == 'Отработан' %}bg-success
+                {% else %}bg-secondary{% endif %}">
+                {{ risk.status }}
+            </span>
+        </div>
+
+        <!-- Основная информация -->
+        <div class="card-body p-4">
+            <div class="row g-4">
+                <!-- Левая колонка -->
+                <div class="col-md-6">
+                    <div class="risk-section">
+                        <i class="bi bi-broadcast-pin text-primary me-2"></i>
+                        <strong>Источник:</strong> {{ risk.source }}
+                    </div>
+                    <div class="risk-section">
+                        <i class="bi bi-clock-history text-primary me-2"></i>
+                        <strong>Дата создания:</strong> {{ risk.date_added }}
+                    </div>
+                    <div class="risk-section">
+                        <i class="bi bi-calendar-check text-primary me-2"></i>
+                        <strong>Срок отработки:</strong>
+                        {% if risk.deadline %}
+                            {{ risk.deadline }}
+                        {% else %}
+                            Не указан
+                        {% endif %}
+                    </div>
+                    <div class="risk-section">
+                        <i class="bi bi-repeat text-primary me-2"></i>
+                        <strong>Повторяющийся:</strong> {{ "Да" if risk.is_repeating else "Нет" }}
+                    </div>
+                    <div class="risk-section">
+                        <i class="bi bi-card-text text-primary me-2"></i>
+                        <strong>Описание:</strong><br>
+                        <div class="ms-4">{{ risk.description or 'Не указано' }}</div>
+                    </div>
+                    <div class="risk-section">
+                        <i class="bi bi-justify text-primary me-2"></i>
+                        <strong>Обоснование:</strong><br>
+                        <div class="ms-4">{{ risk.justification or 'Не указано' }}</div>
+                    </div>
+                </div>
+                <!-- Правая колонка -->
+                <div class="col-md-6">
+                    <div class="risk-section">
+                        <i class="bi bi-list-ul text-primary me-2"></i>
+                        <strong>Категория:</strong> {{ risk.category }}
+                    </div>
+                    <div class="risk-section">
+                        <i class="bi bi-building text-primary me-2"></i>
+                        <strong>МО (ОМСУ):</strong> {{ risk.omsu }}
+                    </div>
+                    <div class="risk-section">
+                        <i class="bi bi-person-vcard text-primary me-2"></i>
+                        <strong>ОИГВ:</strong> {{ risk.oigv }}
+                    </div>
+                    <div class="risk-section">
+                        <i class="bi bi-person-check text-primary me-2"></i>
+                        <strong>Заместитель:</strong> {{ risk.deputy }}
+                    </div>
+                    <div class="risk-section">
+                        <i class="bi bi-geo-alt text-primary me-2"></i>
+                        <strong>Муниципалитет:</strong> {{ risk.municipality }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Комментарии -->
+            <hr class="my-4">
+            <h4 class="mb-3">Комментарии</h4>
+            <div class="mb-4">
+                {% if risk.comments %}
+                    {% for comment in risk.comments %}
+                        <div class="card mb-2">
+                            <div class="card-body p-3">
+                                <p class="mb-1">{{ comment.text }}</p>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">
+                                        {{ comment.author }}
+                                    </small>
+                                    <small class="text-muted">
+                                        {{ comment.timestamp }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-light border">Нет комментариев</div>
+                {% endif %}
+            </div>
+
+            <!-- Вложения -->
+            <hr class="my-4">
+            <h4 class="mb-3">Прикрепленные файлы</h4>
+            <div class="mb-4">
+                {% if risk.attachments %}
+                    <ul class="list-group list-group-flush">
+                        {% for att in risk.attachments %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="{{ att.url }}" target="_blank" class="text-decoration-none">
+                                    <i class="bi bi-file-earmark me-2"></i>{{ att.filename }}
+                                </a>
+                                <span class="badge bg-secondary">PDF</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="alert alert-light border">Нет прикрепленных файлов</div>
+                {% endif %}
+            </div>
+
+            <!-- Формы -->
+            <div class="row">
+                <!-- Форма комментариев -->
+                {% if session.role in ['admin', 'omsu', 'oigv', 'governor'] %}
+                    <div class="col-md-6 mb-4">
+                        <h4 class="mb-3">Добавить комментарий</h4>
+                        <form method="POST" action="{{ url_for('add_comment', index=index) }}">
+                            <div class="mb-3">
+                                <textarea name="comment_text" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-chat-left-text"></i> Отправить
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+
+                <!-- Форма загрузки файла -->
+                {% if session.role in ['admin', 'omsu', 'oigv', 'governor'] %}
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Прикрепить файл</h4>
+                        <form method="POST" action="{{ url_for('upload_attachment', index=index) }}"
+                              enctype="multipart/form-data">
+                            <div class="input-group mb-3">
+                                <input type="file" name="attachment" class="form-control" required>
+                                <button class="btn btn-outline-secondary" type="submit">
+                                    <i class="bi bi-cloud-upload"></i> Загрузить
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Кнопки действий -->
+            <hr class="my-4">
+            <div class="d-flex flex-wrap gap-2">
+                <!-- Кнопка Назад -->
+                {% if from_page == 'calendar' %}
+                    <a href="{{ url_for('calendar') }}" class="btn btn-secondary">← Назад к календарю</a>
+                {% elif from_page == 'archive' %}
+                    <a href="{{ url_for('archive') }}" class="btn btn-secondary">← Назад к архиву</a>
+                {% else %}
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">← Назад к списку</a>
+                {% endif %}
+
+                {% if session.role in ['admin', 'omsu'] and risk.status != 'Отработан' %}
+                    <a href="{{ url_for('edit_risk', index=index) }}" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Редактировать
+                    </a>
+                {% endif %}
+
+                {% if session.role in ['admin', 'governor', 'omsu', 'oigv'] %}
+                    {% if risk.status == 'Новый' %}
+                        <a href="{{ url_for('take_risk', index=index) }}" class="btn btn-warning">
+                            <i class="bi bi-check"></i> Взято в работу
+                        </a>
+                    {% elif risk.status == 'Взято в работу' %}
+                        <a href="{{ url_for('complete_risk', index=index) }}" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Отработано
+                        </a>
+                    {% endif %}
+                {% endif %}
+
+                {% if session.role == 'admin' and risk.status != 'Отработан' %}
+                    <a href="{{ url_for('close_risk', index=index) }}" class="btn btn-danger"
+                       onclick="return confirm('Вы действительно хотите закрыть риск?')">
+                        <i class="bi bi-lock"></i> Закрыть риск
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

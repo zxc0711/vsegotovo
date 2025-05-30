@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- Форма фильтрации -->
+<form method="get" class="mb-4">
+    <div class="row g-3 align-items-end">
+        <!-- Сортировка -->
+        <div class="col-md-3">
+            <label class="form-label">Сортировать по:</label>
+            <select name="sort_by" class="form-select">
+                <option value="date_added" {% if request.args.sort_by == 'date_added' %}selected{% endif %}>Дата (новые)</option>
+                <option value="date_asc" {% if request.args.sort_by == 'date_asc' %}selected{% endif %}>Дата (старые)</option>
+                <option value="criticality" {% if request.args.sort_by == 'criticality' %}selected{% endif %}>Критичность</option>
+            </select>
+        </div>
+
+        <!-- Фильтр по статусу -->
+        <div class="col-md-2">
+            <label class="form-label">Статус</label>
+            <select name="filter_status" class="form-select">
+                <option value="">Все</option>
+                {% for status in statuses %}
+                <option value="{{ status }}" {% if request.args.filter_status == status %}selected{% endif %}>
+                    {{ status }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Фильтр по критичности -->
+        <div class="col-md-2">
+            <label class="form-label">Критичность</label>
+            <select name="filter_criticality" class="form-select">
+                <option value="">Все</option>
+                {% for level in criticality_levels %}
+                <option value="{{ level }}" {% if request.args.filter_criticality == level %}selected{% endif %}>
+                    {{ level }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Фильтр по муниципалитету -->
+        <div class="col-md-3">
+            <label class="form-label">Муниципалитет</label>
+            <select name="filter_municipality" class="form-select">
+                <option value="">Все</option>
+                {% for muni in municipalities %}
+                <option value="{{ muni }}" {% if request.args.filter_municipality == muni %}selected{% endif %}>
+                    {{ muni }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Кнопки управления -->
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Применить</button>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary ms-2">Сбросить</a>
+        </div>
+    </div>
+</form>
+
+<!-- Лента рисков -->
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Лента рисков</h2>
+        {% if session.role in ['admin', 'omsu'] %}
+        <a href="{{ url_for('add_risk') }}" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> Добавить риск
+        </a>
+        {% endif %}
+    </div>
+
+    {% if not risks %}
+    <div class="alert alert-info">Риски не найдены. Попробуйте изменить параметры фильтрации.</div>
+    {% endif %}
+
+    <div class="row g-4">
+        {% for risk in risks %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0">
+                <!-- Заголовок карточки с цветом критичности -->
+
+                <div class="card-header
+    {% if risk.criticality == 'Зеленый' %}bg-success
+    {% elif risk.criticality == 'Желтый' %}bg-warning
+    {% elif risk.criticality == 'Красный' %}bg-danger
+    {% elif risk.criticality == 'Черный' %}bg-dark
+    {% else %}bg-secondary{% endif %}">
+    {{ risk.title }}
+                    <!-- Статус с цветом статуса -->
+                    <span class="badge text-white"
+                          style="background-color: {{ get_risk_color(risk.status) }};">
+                        {{ risk.status }}
+                    </span>
+                </div>
+
+                <!-- Тело карточки -->
+                <div class="card-body">
+                    <div class="mb-3">
+                        <p><strong>Категория:</strong> {{ risk.category }}</p>
+                        <p><strong>Муниципалитет:</strong> {{ risk.municipality }}</p>
+                        <p><strong>Дата добавления:</strong> {{ risk.date_added }}</p>
+                        <p><strong>Срок:</strong>
+                            {% if risk.deadline_value and risk.deadline_unit %}
+                                {{ risk.deadline_value }} {{ risk.deadline_unit }}
+                            {% else %}
+                                Не указан
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- Кнопки действий -->
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('risk_detail', index=loop.index0) }}"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-info-circle"></i> Подробности
+                        </a>
+
+                        {% if session.role in ['admin', 'omsu'] and risk.status != 'Отработан' %}
+                            <a href="{{ url_for('edit_risk', index=loop.index0) }}"
+                               class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil"></i> Редактировать
+                            </a>
+                        {% endif %}
+
+                        {% if session.role == 'admin' and risk.status != 'Отработан' %}
+                            <a href="{{ url_for('close_risk', index=loop.index0) }}"
+                               class="btn btn-sm btn-success"
+                               onclick="return confirm('Закрыть риск?')">
+                                Закрыть
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация -->
+    {% if pagination and pagination.pages > 1 %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('index', page=pagination.prev_num, **request.args) }}">Назад</a>
+            </li>
+            {% endif %}
+
+            {% for page in pagination.iter_pages() %}
+            <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('index', page=page, **request.args) }}">{{ page }}</a>
+            </li>
+            {% endfor %}
+
+            {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('index', page=pagination.next_num, **request.args) }}">Вперед</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

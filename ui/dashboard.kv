@@ -1,0 +1,58 @@
+<Dashboard>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [50, 200, 50, 50]  # Уменьшаем отступы сверху, чтобы кнопки были выше
+        spacing: 25  # Немного увеличиваем отступы между кнопками
+        size_hint_y: None
+        height: 600  # Высота контейнера, можно регулировать
+
+        Label:
+            text: "Главная панель"
+            font_size: 32
+            size_hint_y: None
+            height: 60  # Высота заголовка
+            halign: 'center'
+            valign: 'middle'
+
+        # Сетка для кнопок
+        GridLayout:
+            cols: 2
+            spacing: 25  # Отступы между кнопками
+            size_hint_y: None
+            height: self.minimum_height  # Высота GridLayout зависит от содержимого
+
+            Button:
+                text: "Участники"
+                background_color: 1, 0.5, 0, 1  # FACEIT оранжевый
+                color: 0, 0, 0, 1  # Чёрный текст
+                on_press: app.root.current = 'participants'
+
+            Button:
+                text: "Команды"
+                background_color: 1, 0.5, 0, 1
+                color: 0, 0, 0, 1
+                on_press: print("Открытие команд — в разработке")
+
+            Button:
+                text: "Турниры"
+                background_color: 1, 0.5, 0, 1
+                color: 0, 0, 0, 1
+                on_press: print("Открытие турниров — в разработке")
+
+            Button:
+                text: "Матчи"
+                background_color: 1, 0.5, 0, 1
+                color: 0, 0, 0, 1
+                on_press: print("Открытие матчей — в разработке")
+
+            Button:
+                text: "Результаты"
+                background_color: 1, 0.5, 0, 1
+                color: 0, 0, 0, 1
+                on_press: print("Открытие результатов — в разработке")
+
+            Button:
+                text: "Дисциплины"
+                background_color: 1, 0.5, 0, 1
+                color: 0, 0, 0, 1
+                on_press: print("Открытие дисциплин — в разработке")

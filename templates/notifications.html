@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Уведомления{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">🔔 Ваши уведомления</h2>
+
+  {% if notifications %}
+    {% for n in notifications %}
+      <div class="alert {% if n.read %}alert-secondary{% else %}alert-primary{% endif %} alert-dismissible fade show" role="alert">
+        <small class="text-muted">{{ n.timestamp }}</small><br>
+        {{ n.message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-muted">Нет уведомлений.</p>
+  {% endif %}
+</div>
+{% endblock %}

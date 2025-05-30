@@ -1,0 +1,133 @@
+/* Reset */
+*,::after,::before{box-sizing:border-box;margin:0;padding:0}
+
+/* Global styles */
+body{font-family:"Helvetica Neue",sans-serif;background:#f8f9fa;min-height:100vh;display:flex;flex-direction:column}
+.container-main{flex:1;padding:30px 0}
+.footer{padding:1rem;text-align:center;background:#e9ecef;color:#6c757d}
+
+/* Buttons */
+.btn-primary{background:#0d6efd;border:none}.btn-primary:hover{background:#0b5ed7}
+.btn-success{background:#198754}.btn-success:hover{background:#157347}
+.btn-danger{background:#dc3545}.btn-danger:hover{background:#bb2d3b}
+
+/* Risk cards */
+.card{border-radius:.5rem;box-shadow:0 .125rem .25rem rgba(0,0,0,.075);transition:transform .2s}
+.card:hover{transform:translateY(-2px)}
+.card-header{
+    font-weight:600;
+    border-top-left-radius:.5rem;
+    border-top-right-radius:.5rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:white !important;
+}
+.card-body{padding:1.25rem}
+.risk-section{margin-bottom:.75rem;font-size:.95rem}
+
+/* Status badge */
+.status-badge{
+    color:white !important;
+    background-color:#6c757d !important;
+    margin-left:auto !important;
+}
+
+/* Comments */
+.comments-section{margin-top:2rem}
+.comment-card{margin-bottom:1rem}
+.comment-author{font-weight:bold;color:#212529}
+.comment-text{margin:.5rem 0}
+.comment-timestamp{font-size:.8rem;color:#6c757d}
+
+/* Attachments */
+.attachment-list{list-style:none;padding:0}
+.attachment-item{padding:.5rem 0}
+.attachment-link{color:#0d6efd;text-decoration:none}
+.attachment-link:hover{text-decoration:underline}
+
+/* Forms */
+.form-label{font-weight:600}
+.input-group .form-control{border-radius:.3rem 0 0 .3rem}
+.input-group .btn{border-radius:0 .3rem .3rem 0}
+
+/* Pagination */
+.pagination{margin-top:2rem}
+.page-item.active .page-link{background:#0d6efd;border-color:#0d6efd}
+
+/* Criticality colors */
+.bg-green{background:#28a745!important}.bg-yellow{background:#ffc107!important}
+.bg-red{background:#dc3545!important}.bg-black{background:#000!important}
+
+/* Mobile styles */
+@media (max-width:768px){
+    .row.g-3{margin-bottom:1rem}
+    .card-body{padding:1rem}
+    .risk-section{font-size:.9rem}
+    .status-badge{
+        margin-left:0 !important;
+        margin-top:.5rem !important;
+        width:100%;
+        text-align:right !important;
+    }
+}
+
+/* Animations */
+.fade-in{animation:fadeIn .3s ease-in-out}@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* Alerts */
+.alert-dismissible .btn-close{top:.5rem;right:.5rem}
+.alert-success{background:#d4edda;color:#155724}
+.alert-danger{background:#f8d7da;color:#721c24}
+
+/* FullCalendar */
+.fc-event-title{display:flex;align-items:center;gap:5px}
+.fc-daygrid-day-number{padding:.25rem}
+
+/* Navbar */
+.navbar{background:#343a40}.navbar-brand,.nav-link{color:#fff!important}
+
+/* Container */
+.container-main{flex:1;padding:30px 0}
+
+/* Flash messages */
+.alert{margin-top:1rem}
+
+/* Detail page */
+.risk-title{font-size:1.5rem;margin-bottom:1rem}
+.risk-section{margin-bottom:.75rem}
+
+/* Responsive */
+@media (max-width:992px){
+    .navbar-collapse{background:#343a40}
+}
+
+/* Custom table */
+.report-table{width:100%}.report-table th{background:#ccc}.report-table td{background:#f2f2f2}
+
+/* Добавленные стили для корректного позиционирования статуса */
+.card-header .fw-bold,
+.card-header .status-badge {
+    color: white !important;
+}
+/* Иконки */
+.bi {
+    vertical-align: middle;
+    font-size: 1.2em;
+    margin-right: 0.3rem;
+}
+
+/* Цвета иконок по умолчанию */
+.bi-info-circle { color: #0d6efd; } /* Синяя */
+.bi-pencil { color: #6c757d; }      /* Серая */
+.bi-check-circle { color: #198754; } /* Зеленая */
+.bi-file-earmark { color: #0d6efd; } /* Синяя */
+.bi-x-circle { color: #dc3545; }     /* Красная */
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .bi {
+        font-size: 1em;
+        margin-right: 0.2rem;
+    }
+}

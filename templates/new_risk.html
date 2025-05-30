@@ -1,0 +1,89 @@
+<!doctype html>
+<title>Добавить риск</title>
+<h1>Добавить риск</h1>
+<a href="{{ url_for('index') }}">Назад</a>
+<form method="post">
+  <label>Название риска:<br>
+    <input type="text" name="title" required>
+  </label><br><br>
+
+  <label>Ссылка на источник:<br>
+    <input type="url" name="source_link">
+  </label><br><br>
+
+  <label>Срок отработки:<br>
+    <input type="text" name="deadline" placeholder="Например: 2 часа, 1 день">
+  </label><br><br>
+
+  <label>
+    <input type="checkbox" name="is_repeating"> Повторяющийся риск
+  </label><br><br>
+
+  <label>Описание:<br>
+    <textarea name="description" rows="4" cols="50"></textarea>
+  </label><br><br>
+
+  <label>Обоснование:<br>
+    <textarea name="justification" rows="4" cols="50"></textarea>
+  </label><br><br>
+
+  <label>Категория:<br>
+    <select name="category">
+      {% for c in categories %}
+        <option value="{{ c }}">{{ c }}</option>
+      {% endfor %}
+    </select>
+  </label><br><br>
+
+  <label>ОМСУ:<br>
+    <select name="omsu">
+      {% for o in omsu_list %}
+        <option value="{{ o }}">{{ o }}</option>
+      {% endfor %}
+    </select>
+  </label><br><br>
+
+  <label>ОИГВ:<br>
+    <select name="oigv">
+      {% for o in oigv_list %}
+        <option value="{{ o }}">{{ o }}</option>
+      {% endfor %}
+    </select>
+  </label><br><br>
+
+  <label>Курирующий заместитель губернатора:<br>
+    <select name="governor">
+      {% for g in governor_list %}
+        <option value="{{ g }}">{{ g }}</option>
+      {% endfor %}
+    </select>
+  </label><br><br>
+
+  <label>Муниципалитет:<br>
+    <select name="municipality">
+      {% for m in municipalities %}
+        <option value="{{ m }}">{{ m }}</option>
+      {% endfor %}
+    </select>
+  </label><br><br>
+
+  <label>Критичность:<br>
+    <select name="criticality">
+      {% for crit in criticalities %}
+        <option value="{{ crit }}">{{ crit }}</option>
+      {% endfor %}
+    </select>
+  </label><br><br>
+
+  <input type="submit" value="Внести риск">
+</form>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+    {% for msg in messages %}
+      <li>{{ msg }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
