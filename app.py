@@ -136,7 +136,7 @@ risks = [
         "comments": [],  # Инициализация списка комментариев
         "attachments": []  # Инициализация списка вложений
     }
-    for i in range(15)
+    for i in range(500)
 ]
 
 
@@ -162,7 +162,11 @@ def index():
 
     try:
         reverse = request.args.get('reverse', 'false').lower() == 'true'
-        filtered.sort(key=lambda x: x.get(sort_by, ''), reverse=reverse)
+        # Дефолтная сортировка по дате добавления, от старых к новым
+if sort_by == 'date_added' or sort_by not in risks[0]:
+    filtered.sort(key=lambda x: x['date_added'], reverse=False)
+else:
+    filtered.sort(key=lambda x: x.get(sort_by, ''), reverse=reverse)
     except KeyError:
         pass
 
