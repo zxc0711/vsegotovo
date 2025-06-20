@@ -153,6 +153,7 @@ def index():
     filter_municipality = request.args.get('filter_municipality', '')
 
     filtered = risks[:]
+
     if filter_status:
         filtered = [r for r in filtered if r['status'] == filter_status]
     if filter_criticality:
@@ -160,7 +161,7 @@ def index():
     if filter_municipality:
         filtered = [r for r in filtered if r['municipality'] == filter_municipality]
 
-try:
+    try:
         reverse = request.args.get('reverse', 'false').lower() == 'true'
         # Дефолтная сортировка по дате добавления, от старых к новым
         if sort_by == 'date_added' or sort_by not in risks[0]:
@@ -177,7 +178,6 @@ try:
         criticality_levels=criticality_levels,
         municipalities=municipalities
     )
-
 
 @app.route('/upload_attachment/<int:index>', methods=['POST'])
 @roles_required('admin', 'omsu', 'oigv', 'governor')
