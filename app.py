@@ -160,15 +160,15 @@ def index():
     if filter_municipality:
         filtered = [r for r in filtered if r['municipality'] == filter_municipality]
 
-    try:
-        reverse = request.args.get('reverse', 'false').lower() == 'true'
-        # Дефолтная сортировка по дате добавления, от старых к новым
-if sort_by == 'date_added' or sort_by not in risks[0]:
-    filtered.sort(key=lambda x: x['date_added'], reverse=False)
-else:
-    filtered.sort(key=lambda x: x.get(sort_by, ''), reverse=reverse)
-    except KeyError:
-        pass
+try:
+    reverse = request.args.get('reverse', 'false').lower() == 'true'
+    # Дефолтная сортировка по дате добавления, от старых к новым
+    if sort_by == 'date_added' or sort_by not in risks[0]:
+        filtered.sort(key=lambda x: x['date_added'], reverse=False)
+    else:
+        filtered.sort(key=lambda x: x.get(sort_by, ''), reverse=reverse)
+except KeyError:
+    pass
 
     return render_template(
         'index.html',
