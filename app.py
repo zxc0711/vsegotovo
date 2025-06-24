@@ -180,7 +180,7 @@ def index():
     try:
         reverse = request.args.get('reverse', 'false').lower() == 'true'
         if sort_by == 'date_added' or sort_by not in risks[0]:
-            filtered.sort(key=lambda x: x['date_added'], reverse=False)
+            filtered.sort(key=lambda x: datetime.strptime(x['date_added'], "%Y-%m-%d %H:%M"), reverse=reverse)
         else:
             filtered.sort(key=lambda x: x.get(sort_by, ''), reverse=reverse)
     except KeyError:
