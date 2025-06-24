@@ -164,55 +164,38 @@ def index():
         filtered = [r for r in filtered if r['municipality'] == filter_municipality]
 
     # Фильтрация по возрасту
-    @app.route('/')
-    @roles_required('admin', 'omsu', 'oigv', 'governor')
-    def index():
-        sort_by = request.args.get('sort_by', 'date_added')
-        filter_status = request.args.get('filter_status', '')
-        filter_criticality = request.args.get('filter_criticality', '')
-        filter_municipality = request.args.get('filter_municipality', '')
-        filter_age = request.args.get('filter_age', '')
-
-        now = datetime.now()
-        filtered = risks[:]
-
-        if filter_status:
-            filtered = [r for r in filtered if r['status'] == filter_status]
-        if filter_criticality:
-            filtered = [r for r in filtered if r['criticality'] == filter_criticality]
-        if filter_municipality:
-            filtered = [r for r in filtered if r['municipality'] == filter_municipality]
-
-        def parse_date_safe(date_str):
-            try:
-                return datetime.strptime(date_str, "%Y-%m-%d %H:%M")
-            except Exception:
-                return datetime.min
-
-        if filter_age:
-            week_ago = now - timedelta(days=7)
-            if filter_age == 'new':
-                filtered = [r for r in filtered if parse_date_safe(r['date_added']) > week_ago]
-            elif filter_age == 'old':
-                filtered = [r for r in filtered if parse_date_safe(r['date_added']) <= week_ago]
-
+    def parse_date_safe(date_str):
         try:
-            reverse = request.args.get('reverse', 'false').lower() == 'true'
-            if sort_by == 'date_added' or sort_by not in risks[0]:
-                filtered.sort(key=lambda x: parse_date_safe(x['date_added']), reverse=reverse)
-            else:
-                filtered.sort(key=lambda x: x.get(sort_by, ''), reverse=reverse)
-        except KeyError:
-            pass
+            return datetime.strptime(date_str, "%Y-%m-%d %H:%M")
+        except Exception:
+            return datetime.min
 
-        return render_template(
-            'index.html',
-            risks=filtered,
-            statuses=statuses,
-            criticality_levels=criticality_levels,
-            municipalities=municipalities,
-            filter_age=filter_age
-        )
+    if filter_age:
+        week_ago = now - timedelta(days=7)
+        if filter_age == 'new':
+            filtered = [r for r in filtered if parse_date_safe(r['date_added']) > week_ago]
+        elif filter_age == 'old':
+            filtered = [r for r in filtered if parse_date_safe(r['date_added']) <= week_ago]
+
+    try:
+        reverse = request.args.get('reverse', 'false').lower() == 'true'
+        if sort_by == 'date_added' or sort_by not in risks[0]:
+            filtered.sort(key=lambda x: parse_date_safe(x['date_added']), reverse=reverse)
+        else:
+            filtered.sort(key=lambda x: x.get(sort_by, ''), reverse=reverse)
+    except KeyError:
+        pass
+
+    return render_template(
+        'index.html',
+        risks=filtered,
+        statuses=statuses,
+        criticality_levels=criticality_levels,
+        municipalities=municipalities,
+        # Передаем значение filter_age в шаблон
+        filter_age=filter_age
+    )
+
 
 @app.route('/upload_attachment/<int:index>', methods=['POST'])
 @roles_required('admin', 'omsu', 'oigv', 'governor')
