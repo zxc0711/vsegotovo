@@ -162,30 +162,29 @@ def index():
         filtered = [r for r in filtered if r['criticality'] == filter_criticality]
     if filter_municipality:
         filtered = [r for r in filtered if r['municipality'] == filter_municipality]
-    
+
     # Фильтрация по возрасту
-def parse_date_safe(date_str):
+    def parse_date_safe(date_str):
+        try:
+            return datetime.strptime(date_str, "%Y-%m-%d %H:%M")
+        except Exception:
+            return datetime.min
+
+    if filter_age:
+        week_ago = now - timedelta(days=7)
+        if filter_age == 'new':
+            filtered = [r for r in filtered if parse_date_safe(r['date_added']) > week_ago]
+        elif filter_age == 'old':
+            filtered = [r for r in filtered if parse_date_safe(r['date_added']) <= week_ago]
+
     try:
-        return datetime.strptime(date_str, "%Y-%m-%d %H:%M")
-    except Exception:
-        return datetime.min
-
-if filter_age:
-    week_ago = now - timedelta(days=7)
-    if filter_age == 'new':
-        filtered = [r for r in filtered if parse_date_safe(r['date_added']) > week_ago]
-    elif filter_age == 'old':
-        filtered = [r for r in filtered if parse_date_safe(r['date_added']) <= week_ago]
-
-try:
-    reverse = request.args.get('reverse', 'false').lower() == 'true'
-    if sort_by == 'date_added' or sort_by not in risks[0]:
-        filtered.sort(key=lambda x: parse_date_safe(x['date_added']), reverse=reverse)
-    else:
-        filtered.sort(key=lambda x: x.get(sort_by, ''), reverse=reverse)
-except KeyError:
-    pass
-
+        reverse = request.args.get('reverse', 'false').lower() == 'true'
+        if sort_by == 'date_added' or sort_by not in risks[0]:
+            filtered.sort(key=lambda x: parse_date_safe(x['date_added']), reverse=reverse)
+        else:
+            filtered.sort(key=lambda x: x.get(sort_by, ''), reverse=reverse)
+    except KeyError:
+        pass
 
     return render_template(
         'index.html',
@@ -196,6 +195,7 @@ except KeyError:
         # Передаем значение filter_age в шаблон
         filter_age=filter_age
     )
+
 
 @app.route('/upload_attachment/<int:index>', methods=['POST'])
 @roles_required('admin', 'omsu', 'oigv', 'governor')
