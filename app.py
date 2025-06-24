@@ -151,7 +151,9 @@ def index():
     filter_status = request.args.get('filter_status', '')
     filter_criticality = request.args.get('filter_criticality', '')
     filter_municipality = request.args.get('filter_municipality', '')
+    filter_age = request.args.get('filter_age', '')  # Новый фильтр
 
+    now = datetime.now()
     filtered = risks[:]
 
     if filter_status:
@@ -160,10 +162,23 @@ def index():
         filtered = [r for r in filtered if r['criticality'] == filter_criticality]
     if filter_municipality:
         filtered = [r for r in filtered if r['municipality'] == filter_municipality]
+    
+    # Фильтрация по возрасту
+    if filter_age:
+        week_ago = now - timedelta(days=7)
+        if filter_age == 'new':
+            filtered = [
+                r for r in filtered
+                if datetime.strptime(r['date_added'], "%Y-%m-%d %H:%M") > week_ago
+            ]
+        elif filter_age == 'old':
+            filtered = [
+                r for r in filtered
+                if datetime.strptime(r['date_added'], "%Y-%m-%d %H:%M") <= week_ago
+            ]
 
     try:
         reverse = request.args.get('reverse', 'false').lower() == 'true'
-        # Дефолтная сортировка по дате добавления, от старых к новым
         if sort_by == 'date_added' or sort_by not in risks[0]:
             filtered.sort(key=lambda x: x['date_added'], reverse=False)
         else:
@@ -176,7 +191,9 @@ def index():
         risks=filtered,
         statuses=statuses,
         criticality_levels=criticality_levels,
-        municipalities=municipalities
+        municipalities=municipalities,
+        # Передаем значение filter_age в шаблон
+        filter_age=filter_age
     )
 
 @app.route('/upload_attachment/<int:index>', methods=['POST'])
